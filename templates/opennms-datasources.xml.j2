@@ -1,7 +1,9 @@
 {{ ansible_managed | comment('xml') }}
 
-<?xml version="1.0" encoding="UTF-8"?>
-  <datasource-configuration xmlns:this="http://xmlns.opennms.org/xsd/config/opennms-datasources" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-datasources http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
+<datasource-configuration xmlns:this="http://xmlns.opennms.org/xsd/config/opennms-datasources"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.opennms.org/xsd/config/opennms-datasources
+  http://www.opennms.org/xsd/config/opennms-datasources.xsd ">
 
   <connection-pool factory="org.opennms.core.db.C3P0ConnectionFactory"
     idleTimeout="600"
@@ -13,15 +15,15 @@
   <jdbc-data-source name="opennms"
     database-name="{{ opennms_database_name }}"
     class-name="org.postgresql.Driver"
-    url="jdbc:postgresql://localhost:5432/opennms"
+    url="jdbc:postgresql://localhost:5432/{{ opennms_database_name }}"
     user-name="{{ opennms_database_user }}"
     password="{{ opennms_database_pass }}" />
 
   <jdbc-data-source name="opennms-admin"
-    database-name="template1"
+    database-name="postgres"
     class-name="org.postgresql.Driver"
-    url="jdbc:postgresql://localhost:5432/template1"
-    user-name="{{ opennms_database_admin }}"
-    password="{{ opennms_database_admin_pass }}" />
+    url="jdbc:postgresql://localhost:5432/postgres"
+    user-name="{{ opennms_database_user }}"
+    password="{{ opennms_database_pass }}" />
 
 </datasource-configuration>

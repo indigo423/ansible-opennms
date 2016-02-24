@@ -19,15 +19,6 @@
   command: postgresql-setup initdb
   args:
     creates: /var/lib/pgsql/data/base
-  notify:
-    - init java
-    - init database
-
-- name: opennms | ensure postgresql service is running
-  service: >
-    name=postgresql
-    state=started
-    enabled=true
 
 - name: opennms | configure database access policies
   template: >
@@ -38,6 +29,12 @@
     mode=0600
   notify:
     - reload postgresql
+
+- name: opennms | ensure postgresql service is running
+  service: >
+    name=postgresql
+    state=started
+    enabled=true
 
 - name: postgresql | ensure database is created
   become_user: postgres
@@ -69,5 +66,15 @@
     owner=root
     group=root
     mode=0664
-  notify:
-    - reload opennms
+
+- name: init java
+  command: '{{ opennms_install_dir }}/bin/runjava -s'
+
+- name: init database
+  command: '{{ opennms_install_dir }}/bin/install -dis'
+
+- name: ensure opennms service is running
+  service: >
+    name=opennms
+    state=started
+    enabled=yes
