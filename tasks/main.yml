@@ -1,2 +1,73 @@
 ---
-# tasks file for tmp-opennms
+
+- name: opennms | install opennms package repository
+  yum: >
+    name=http://yum.opennms.org/repofiles/opennms-repo-{{ opennms_release }}-rhel7.noarch.rpm
+    state=installed
+
+- name: opennms | install opennms gpg key
+  rpm_key: >
+    key='{{ opennms_gpg_url }}'
+    state=present
+
+- name: opennms | install opennms package
+  yum: >
+    name=opennms
+    state=installed
+
+- name: opennms | initialize postgresql database
+  command: postgresql-setup initdb
+  args:
+    creates: /var/lib/pgsql/data/base
+  notify:
+    - init java
+    - init database
+
+- name: opennms | ensure postgresql service is running
+  service: >
+    name=postgresql
+    state=started
+    enabled=true
+
+- name: opennms | configure database access policies
+  template: >
+    src=templates/pg_hba.conf.j2
+    dest=/var/lib/pgsql/data/pg_hba.conf
+    owner=postgres
+    group=postgres
+    mode=0600
+  notify:
+    - reload postgresql
+
+- name: postgresql | ensure database is created
+  become_user: postgres
+  postgresql_db: >
+    name={{ opennms_database_name }}
+    login_host=localhost
+    state=present
+
+- name: opennms | configure user access to database
+  become_user: postgres
+  postgresql_user: >
+    db={{ opennms_database_name }}
+    name={{ opennms_database_user }}
+    password={{ opennms_database_pass }}
+    priv=ALL
+    state=present
+
+- name: opennms | configure user privileges
+  become_user: postgres
+  postgresql_user: >
+    name={{ opennms_database_user }}
+    role_attr_flags=NOSUPERUSER
+    state=present
+
+- name: opennms | configure opennms to use database
+  template: >
+    src=templates/opennms-datasources.xml.j2
+    dest='{{ opennms_install_dir }}/etc/opennms-datasources.xml'
+    owner=root
+    group=root
+    mode=0664
+  notify:
+    - reload opennms

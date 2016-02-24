@@ -1,2 +1,17 @@
 ---
-# handlers file for tmp-opennms
+
+- name: reload postgresql
+  service: >
+    name=postgresql
+    state=reloaded
+
+- name: reload opennms
+  service: >
+    name=opennms
+    state=reloaded
+
+- name: init java
+  command: '{{ opennms_install_dir }}/bin/runjava -s'
+
+- name: init database
+  command: '{{ opennms_install_dir }}/bin/install -dis'

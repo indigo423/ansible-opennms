@@ -1,2 +1,17 @@
 ---
-# defaults file for tmp-opennms
+
+opennms_gpg_url: 'http://yum.opennms.org/OPENNMS-GPG-KEY'
+
+opennms_release: stable
+
+opennms_install_dir: /opt/opennms
+
+opennms_database_name: opennms
+
+opennms_database_user: opennms
+
+opennms_database_pass: nooneknows
+
+opennms_database_admin: admin
+
+opennms_database_admin_pass: thepower
